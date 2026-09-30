@@ -90,6 +90,15 @@ La navegación pública tiene exactamente estas secciones, en este orden:
 7. **Importante** — accesos rápidos y estado de la liga.
 8. **Equipos** — owner, master y staff con avatar y banner.
 
+### El inicio
+
+- **Hero cinematográfico** con el escudo sobre tres órbitas luminosas, esquinas y destellos.
+- **Barra de datos** con cinco métricas y contador animado al entrar en pantalla.
+- **Tarjetas de resumen** con el próximo partido y la cabeza de tabla de D1.
+- **Marquee** con los ocho módulos, **barra de progreso** de lectura y **botón de volver arriba**.
+- **Aparición progresiva** de tarjetas al hacer scroll, respetando `prefers-reduced-motion`.
+- **Rieles laterales** con la división y la temporada en vertical (a partir de 1180 px).
+
 ---
 
 ## El panel de administración
@@ -119,6 +128,15 @@ Las colecciones (Partidos, Equipos, Noticias, Anuncios, Premios, Salas, Importan
 guardan al instante. Reglas, Competición y Ajustes usan borradores: editas lo que quieras y
 publicas con un botón, para no dejar la liga a medias.
 
+### Usar el panel
+
+- **Menú agrupado** en cuatro bloques (Panel, Competición, Contenido, Administración) con iconos.
+- **Búsqueda en vivo** en la barra superior: filtra la lista mientras escribes. Atajo <kbd>/</kbd>.
+- **Filtros por chip** en Partidos (división, estado), Equipos, Noticias, Premios, Salas y Equipo.
+- **Atajo <kbd>n</kbd>** abre el alta del registro actual y <kbd>Esc</kbd> cierra el editor.
+- **Contador contextual**: indica `X de Y` cuando hay un filtro activo.
+- **Resumen** con barras de partidos por estado y accesos rápidos a las tareas habituales.
+
 ### Añadir un campo nuevo
 
 El panel se construye a partir de una sola tabla, así que un campo nuevo sale en la UI
@@ -137,11 +155,12 @@ automáticamente:
 | `npm start`      | Arranca el servidor.                                          |
 | `npm run dev`    | Arranca con recarga automática.                                |
 | `npm run check`  | Comprueba la sintaxis de los 20 ficheros JavaScript.           |
-| `npm test`       | Levanta un servidor de prueba y ejecuta 250 comprobaciones.   |
+| `npm test`       | Levanta un servidor de prueba y ejecuta 282 comprobaciones.   |
 
 Las pruebas no tocan `data/db.json`: usan un directorio temporal. Cubren la API y la
-persistencia, el renderizado de los 8 módulos en el navegador y el CRUD completo del panel
-(alta de un partido con fecha y hora, edición de resultados y borrado).
+persistencia, el renderizado de los 8 módulos en el navegador, el hero y sus animaciones, y el
+CRUD completo del panel (alta de un partido con fecha y hora, edición de resultados, borrado,
+búsqueda en vivo, filtros por chip y atajos de teclado).
 
 ---
 
