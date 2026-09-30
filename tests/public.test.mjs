@@ -161,6 +161,22 @@ export async function runPublicTests() {
     const matches = document.querySelectorAll('.match');
     check('Se muestran 70 partidos', matches.length === 70, String(matches.length));
 
+    suite('Hero y animaciones');
+    const stage = document.querySelector('.hero-stage');
+    check('El hero monta el escenario del logo', Boolean(stage));
+    check('El logo va sobre tres órbitas', stage.querySelectorAll('.hero-orbit').length === 3);
+    check('Cada órbita lleva su punto luminoso', stage.querySelectorAll('.hero-orbit i').length === 3);
+    check('El emblema usa el logo del sitio', stage.querySelector('img').getAttribute('src') === '/assets/logo-mark.png');
+    check('El hero tiene esquinas decorativas', stage.querySelectorAll('.hero-corner').length === 4);
+    check('El titular es único', document.querySelectorAll('h1').length === 1);
+    check('El titular divide el nombre de la liga', /The Diamonds/.test(document.querySelector('h1').textContent));
+    check('La barra de datos tiene 5 métricas', document.querySelectorAll('.stat-strip li').length === 5);
+    check('El marquee lista los 8 módulos', document.querySelectorAll('.marquee-group:first-child .marquee-item').length === 8);
+    check('Hay barra de progreso de lectura', Boolean(document.querySelector('.scroll-progress [data-scroll-bar]')));
+    const toTop = document.querySelector('[data-to-top]');
+    check('El botón de volver arriba empieza oculto', toTop.hidden === true);
+    check('El botón de volver arriba es un control', toTop.tagName === 'BUTTON');
+
     suite('Sin JavaScript');
     const noscripts = Array.from(document.querySelectorAll('noscript'));
     check('Hay un bloque noscript', noscripts.length > 0, String(noscripts.length));

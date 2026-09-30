@@ -244,6 +244,61 @@ export async function runAdminTests() {
     check('El modal tiene aria-modal', errorModal.getAttribute('aria-modal') === 'true');
     document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     check('Escape cierra el modal', errorModal.hidden === true);
+
+    suite('Barra lateral agrupada');
+    const navGroups = Array.from(document.querySelectorAll('.app-nav-group'));
+    check('El menú se agrupa', navGroups.length === 4, String(navGroups.length));
+    check('Los grupos tienen título', navGroups.every((g) => Boolean(g.querySelector('.app-nav-title'))));
+    check('Los botones del menú llevan icono', Array.from(document.querySelectorAll('[data-app-nav] button')).every((b) => Boolean(b.querySelector('svg'))));
+
+    suite('Búsqueda y filtros en vivo');
+    mod.go('teams');
+    await wait(30);
+    const search = document.querySelector('[data-app-search]');
+    const teamsTotal = body.querySelectorAll('.app-card').length;
+    check('El buscador está habilitado en colecciones', search.disabled === false);
+    const firstTeam = body.querySelector('.app-card h3').textContent;
+    search.value = 'zzzz-no-existe';
+    search.dispatchEvent(new window.Event('input', { bubbles: true }));
+    const visibleAfterMiss = body.querySelectorAll('.app-card:not([hidden])').length;
+    check('La búsqueda sin resultados oculta las tarjetas', visibleAfterMiss === 0, String(visibleAfterMiss));
+    check('Aparece el estado vacío', body.querySelectorAll('.app-empty-box:not([hidden])').length === 1);
+    search.value = firstTeam;
+    search.dispatchEvent(new window.Event('input', { bubbles: true }));
+    const visibleAfterHit = body.querySelectorAll('.app-card:not([hidden])').length;
+    check('La búsqueda encuentra el equipo', visibleAfterHit === 1, String(visibleAfterHit));
+    check('El contador refleja el filtro', body.querySelector('.app-count').textContent.includes('de'));
+    check('La búsqueda no borra los datos', body.querySelectorAll('.app-card').length === teamsTotal, String(teamsTotal));
+
+    mod.go('matches');
+    await wait(30);
+    const filterSets = body.querySelectorAll('.app-filter-set');
+    const divisionChips = filterSets[0];
+    const statusChips = filterSets[1];
+    check('Partidos ofrece filtro por división', Boolean(divisionChips.querySelector('.app-chip[data-value="d1"]')));
+    check('Partidos ofrece filtro por estado', Boolean(statusChips.querySelector('.app-chip[data-value="finalizado"]')));
+    const shown = () => body.querySelectorAll('.app-list .app-card:not([hidden])').length;
+
+    click(statusChips.querySelector('.app-chip[data-value="programado"]'));
+    check('El chip activo queda marcado', statusChips.querySelector('[data-value="programado"]').getAttribute('aria-pressed') === 'true');
+    check('El filtro deja solo los programados', shown() === 66, String(shown()));
+    click(statusChips.querySelector('.app-chip[data-value="por-definir"]'));
+    check('El filtro cambia a por definir', shown() === 4, String(shown()));
+    check('El contador refleja el filtro', body.querySelector('.app-count').textContent.includes('de'));
+    click(statusChips.querySelector('.app-chip[data-value="all"]'));
+    check('El filtro “todas” restaura la lista', shown() === 70, String(shown()));
+    check('Las clasificaciones no se filtran', body.querySelectorAll('table.standings').length === 2);
+
+    suite('Atajos de teclado');
+    const key = (k) => document.dispatchEvent(new window.KeyboardEvent('keydown', { key: k, bubbles: true }));
+    search.blur();
+    key('/');
+    check('La tecla / enfoca la búsqueda', document.activeElement === search);
+    search.blur();
+    key('n');
+    check('La tecla n abre el alta', document.querySelector('[data-modal]').hidden === false);
+    document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    check('Escape cierra el alta', document.querySelector('[data-modal]').hidden === true);
   } finally {
     await server.stop();
   }

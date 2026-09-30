@@ -57,27 +57,63 @@ function header({ settings, isAdmin }) {
 </header>`;
 }
 
+function heroMarquee() {
+  const items = MODULES.map(
+    (module) => `<span class="marquee-item">${esc(module.label)}</span><i class="marquee-dot" aria-hidden="true"></i>`
+  ).join('');
+  return `<div class="marquee" aria-hidden="true">
+  <div class="marquee-track">
+    <div class="marquee-group">${items}</div>
+    <div class="marquee-group">${items}</div>
+  </div>
+</div>`;
+}
+
 function hero({ data, standings }) {
-  const { settings, pubs, matches } = data;
-  const upcoming = nextMatch(matches, data.divisions);
+  const { settings, pubs, matches, divisions, teams } = data;
+  const upcoming = nextMatch(matches, divisions);
   const d1 = standings.d1;
   const leaders = d1.slice(0, 3);
   const openRooms = pubs.filter((room) => room.status === 'ABIERTA').length;
+  const d1Teams = teams.filter((t) => t.division === 'd1').length;
 
   const stats = [
     { label: 'Modalidad', value: settings.modality },
-    { label: 'Divisiones', value: String(data.divisions.length).padStart(2, '0') },
-    { label: 'Equipos D1', value: String(data.teams.filter((t) => t.division === 'd1').length).padStart(2, '0') },
+    { label: 'Divisiones', value: String(divisions.length).padStart(2, '0') },
+    { label: 'Equipos D1', value: String(d1Teams).padStart(2, '0') },
     { label: 'Salas públicas', value: String(pubs.length).padStart(2, '0') },
     { label: 'Estado', value: settings.status, live: true }
   ];
 
   return `<section class="hero" id="inicio">
-  <div class="hero-bg" aria-hidden="true"></div>
+  <div class="hero-bg" aria-hidden="true">
+    <span class="hero-aura"></span>
+    <span class="hero-beam"></span>
+    <span class="hero-lines"></span>
+    <span class="hero-grain"></span>
+  </div>
+  <p class="hero-rail hero-rail-start" aria-hidden="true">División ${String(divisions.length).padStart(2, '0')}</p>
+  <p class="hero-rail hero-rail-end" aria-hidden="true">${esc(settings.season)}</p>
+
   <div class="shell hero-inner">
-    <div class="hero-copy">
-      <p class="eyebrow"><span class="dot"></span>${esc(settings.season)} · ${esc(settings.status)}</p>
-      <h1 class="hero-title">The Diamonds <em>League</em></h1>
+    <div class="hero-core">
+      <p class="eyebrow hero-eyebrow"><span class="dot"></span>${esc(settings.season)} · ${esc(settings.status)}</p>
+
+      <div class="hero-stage">
+        <span class="hero-corner hero-corner-tl" aria-hidden="true"></span>
+        <span class="hero-corner hero-corner-tr" aria-hidden="true"></span>
+        <span class="hero-corner hero-corner-bl" aria-hidden="true"></span>
+        <span class="hero-corner hero-corner-br" aria-hidden="true"></span>
+        <span class="hero-orbit hero-orbit-1" aria-hidden="true"><i></i></span>
+        <span class="hero-orbit hero-orbit-2" aria-hidden="true"><i></i></span>
+        <span class="hero-orbit hero-orbit-3" aria-hidden="true"><i></i></span>
+        <span class="hero-spark" aria-hidden="true"></span>
+        <div class="hero-emblem">
+          <img src="/assets/logo-mark.png" width="164" height="164" alt="" aria-hidden="true" fetchpriority="high" decoding="async">
+        </div>
+      </div>
+
+      <h1 class="hero-title"><span>The Diamonds</span><em>League</em></h1>
       <p class="hero-lead">${esc(settings.description)}</p>
       <div class="hero-actions">
         <a class="btn btn-primary" href="#competencia">Ver competencia</a>
@@ -85,43 +121,9 @@ function hero({ data, standings }) {
       </div>
       <p class="hero-note">${esc(settings.statusNote)}</p>
     </div>
-
-    <aside class="hero-panel" aria-label="Resumen de la liga">
-      <div class="hero-mark">
-        <img src="/assets/logo-mark.png" width="120" height="120" alt="" aria-hidden="true">
-        <div>
-          <small>${esc(settings.leagueName)}</small>
-          <strong>${esc(settings.season)}</strong>
-        </div>
-      </div>
-      ${
-        upcoming
-          ? `<a class="next-match" href="#fechas">
-              <span class="next-label">Próximo partido</span>
-              <strong class="next-teams">${esc(upcoming.home)} <i>vs</i> ${esc(upcoming.away)}</strong>
-              <span class="next-meta">${esc(upcoming.divisionName)} · ${esc(dayLabel(upcoming.date))} · ${esc(
-                timeLabel(upcoming.time)
-              )}</span>
-            </a>`
-          : `<div class="next-match"><span class="next-label">Calendario</span><strong class="next-teams">Sin partidos programados</strong><span class="next-meta">El staff publicará las próximas fechas</span></div>`
-      }
-      ${
-        leaders.length
-          ? `<div class="hero-leaders">
-              <span class="next-label">Cabeza de tabla · D1</span>
-              <ol>${leaders
-                .map(
-                  (row) =>
-                    `<li><b>${row.position}</b><span>${esc(row.name)}</span><i>${row.points} pts</i></li>`
-                )
-                .join('')}</ol>
-            </div>`
-          : ''
-      }
-    </aside>
   </div>
 
-  <div class="shell">
+  <div class="shell hero-foot">
     <ul class="stat-strip">
       ${stats
         .map(
@@ -135,7 +137,35 @@ function hero({ data, standings }) {
     <p class="rooms-note">${esc(plural(openRooms, 'sala pública abierta', 'salas públicas abiertas'))} de ${
       pubs.length
     } en este momento.</p>
+
+    <div class="hero-brief">
+      ${
+        upcoming
+          ? `<a class="brief-card next-match" href="#fechas">
+              <span class="next-label">Próximo partido</span>
+              <strong class="next-teams">${esc(upcoming.home)} <i>vs</i> ${esc(upcoming.away)}</strong>
+              <span class="next-meta">${esc(upcoming.divisionName)} · ${esc(dayLabel(upcoming.date))} · ${esc(
+                timeLabel(upcoming.time)
+              )}</span>
+            </a>`
+          : `<div class="brief-card next-match"><span class="next-label">Calendario</span><strong class="next-teams">Sin partidos programados</strong><span class="next-meta">El staff publicará las próximas fechas</span></div>`
+      }
+      ${
+        leaders.length
+          ? `<div class="brief-card hero-leaders">
+              <span class="next-label">Cabeza de tabla · D1</span>
+              <ol>${leaders
+                .map(
+                  (row) => `<li><b>${row.position}</b><span>${esc(row.name)}</span><i>${row.points} pts</i></li>`
+                )
+                .join('')}</ol>
+            </div>`
+          : ''
+      }
+    </div>
   </div>
+
+  ${heroMarquee()}
 </section>`;
 }
 
@@ -858,6 +888,7 @@ export function renderHome({ data, siteUrl, isAdmin }) {
 
   const content = [
     header({ settings, isAdmin }),
+    `<div class="scroll-progress" aria-hidden="true"><span data-scroll-bar></span></div>`,
     `<main id="contenido">`,
     hero({ data, standings }),
     modulesGrid(),
@@ -872,6 +903,11 @@ export function renderHome({ data, siteUrl, isAdmin }) {
     `</main>`,
     footer({ data }),
     lightbox(),
+    `<button class="to-top" type="button" data-to-top aria-label="Volver arriba" hidden>
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" focusable="false">
+        <path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>`,
     `<noscript><style>
       .panel[hidden]{display:block!important}
       .tablist,.chip-row,.nav-toggle,.rooms-note{display:none!important}
