@@ -1,0 +1,22 @@
+{
+  "name": "diamonds-league",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Sitio oficial y panel de administracion de The Diamonds League (liga competitiva de HaxBall X5).",
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "check": "node tests/syntax.mjs",
+    "test": "node tests/run.mjs"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}
